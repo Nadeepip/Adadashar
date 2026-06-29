@@ -28,24 +28,14 @@
         }
         body {
             margin: 0;
-            padding: 0;
-            background-color: #f0f4f8;
+            padding: 18px;
+            background-color: #f7f9fc;
             height: 100vh;
             display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            justify-content: center;
         }
         .hidden {
             display: none !important;
-        }
-        .screen {
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            padding-bottom: 250px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         .card {
             width: 100%;
@@ -194,19 +184,6 @@
             z-index: 900;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        #top-ui-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 10px;
-            margin-top: 50px;
-            z-index: 1000;
-            position: sticky;
-            top: 0;
-            background-color: #f0f4f8;
-            transition: all 0.3s;
-        }
         #progressBarContainer {
             width: 100%;
             height: 8px;
@@ -230,7 +207,6 @@
             transition: left 0.3s ease;
         }
         .canvasWrap {
-            width: 100%;
             border: 3px dashed #ff4382;
             border-radius: 12px;
             padding: 10px;
@@ -248,7 +224,6 @@
             background: #fff;
         }
         .inputs {
-            width: 100%;
             display: flex;
             direction: ltr;
             gap: 2px;
@@ -260,9 +235,6 @@
             padding: 10px 2px;
             border-radius: 12px;
             border: 2px dashed #ff9800;
-        }
-        #register-container {
-            width: 100%;
         }
         .flex-row {
             display: flex;
@@ -314,62 +286,50 @@
             text-align: center;
             margin-bottom: 6px;
         }
-        .report-card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            max-width: 350px;
-            width: 90%;
-            text-align: right;
-            margin-top: 70px;
-        }
-        .report-item {
+        .profile {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px dotted #eee;
+            font-weight: 900;
+            color: #4a148c;
+            margin-bottom: 8px;
+            padding: 6px 8px;
+            border-radius: 10px;
+            background: #fff3f8;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 14px;
         }
-        .report-item span:first-child {
-            font-weight: bold;
-            color: #555;
+        .report {
+            display: none;
+            margin-top: 8px;
         }
-        @keyframes blink-fill {
-            0% { background-color: #ffe082; transform: scale(1.1); box-shadow: 0 0 10px #f39c12; }
-            50% { background-color: #f1c40f; transform: scale(1.15); border-color: #d35400; }
-            100% { background-color: #d4edda; transform: scale(1); box-shadow: none; }
+        #reportText {
+            text-align: right;
+            line-height: 1.8;
+            font-weight: 700;
+            background: #f7f7f7;
+            padding: 10px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+        } 
+        @keyframes fall {
+            0% { transform: translateY(-20vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .flower {
+            position: fixed;
+            pointer-events: none;
+            animation: fall 2.6s linear;
+            z-index: 9999;
         }
     </style>
 </head>
 <body>
+    <div class="card" role="main" style="margin-top: 60px;">
+        <h1 id="game-main-title">دبستان معاد خرگوشی — عدد اعشاری</h1>
 
-    <div id="Screen-Loading" style="display:none; background:linear-gradient(135deg,#a1c4fd,#c2e9fb); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
-        <div style="font-size: 3.5rem; margin-bottom: 15px;">🐰</div>
-        <h1 style="color:#2c3e50; font-size:24pt; margin-bottom:30px; font-weight: bold;">عدد اعشاری</h1>
-        <div style="background:#e0e0e0; border-radius:12px; height:18px; width:80%; max-width:400px; overflow:hidden; margin-bottom:18px; border:2px solid #2c3e50; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
-            <div id="portal-loading-bar" style="background: linear-gradient(90deg, #ff007f, #aa00ff, #00b0ff); width:0%; height:100%; transition:width 0.3s ease; box-shadow: 0 0 10px rgba(170,0,255,0.5);"></div>
-        </div>
-        <p id="portal-loading-text" style="font-size:13pt; color:#2c3e50; font-weight:bold;"></p>
-    </div>
-
-    <div id="stats-bar" class="hidden">
-        <div>👤 <span id="disp-name">-</span></div>
-        <div style="display:flex; gap:15px;">
-            <span>🎮 <span id="disp-games">۰</span></span>
-            <span>⭐ <span id="disp-stars">۰</span></span>
-        </div>
-    </div>
-
-    <div class="card" style="margin-top: 60px;">
-        <div id="screen-register" class="screen">
-            <span class="school-name" id="portal-school-title" style="font-size: 0.85em; color: #7f8c8d; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 8px; display: block; width: 100%; text-align: center;">دبستان معاد خرگوشی</span>
-            <h1 style="font-size: 18px; color: #d81b60; text-align: center; margin: 6px 0 12px; font-weight: 900;">عدد اعشاری</h1>
-            
-            <div id="register-container">
+        <div id="registerArea" class="row" style="flex-direction: column; align-items: center; width: 100%;">
+            <div id="register-container" style="width: 100%; text-align: center;">
                 <div id="portal-welcome-section">
                     <h1 style="color:#2c3e50; font-size:1.5rem; margin-bottom:10px;">سلام دانش‌آموز زرنگم! 🌟</h1>
                     <p style="color:#555; margin-bottom:15px; font-size:0.95em;">بیا با هم عددهای اعشاری رو تمرین کنیم و ستاره بگیریم!</p>
@@ -404,7 +364,13 @@
             </div>
         </div>
 
-        <div id="screen-game" class="screen hidden">
+        <div id="profile" class="profile" style="display:none;">
+            <div id="pName">-</div>
+            <div id="pGames">🎮 ۰</div>
+            <div id="pStars">⭐ ۰</div>
+        </div>
+
+        <div id="gameArea" style="display:none;">
             <div id="progressBarContainer">
                 <div id="rabbitIcon">🐰</div>
                 <div id="progressFill"></div>
@@ -446,7 +412,7 @@
                 </div>
             </div>
 
-            <div style="text-align:center; display: flex; justify-content: space-around; gap: 6px; width: 100%;">
+            <div style="text-align:center; display: flex; justify-content: space-around; gap: 6px;">
                 <button id="btnCheck" class="btn-check" style="width: 30%;">بررسی</button>
                 <button id="btnShowAnswer" class="btn-answer" style="display:none; width: 30%;">جواب</button>
                 <button id="btnNewQuestion" class="btn-new-q" style="display:none; width: 30%;">سوال جدید</button>
@@ -456,7 +422,7 @@
             <div id="feedback" aria-live="assertive"></div>
         </div>
 
-        <div id="screen-report" class="screen hidden" style="width: 100%;">
+        <div id="reportArea" class="report">
             <h3 style="text-align:center; margin-bottom: 15px; color: #d81b60;">کارنامه درخشانت 🌟</h3>
             
             <div style="text-align: right; background: #fafafa; padding: 15px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 20px; font-weight: bold; line-height: 1.8;">
@@ -484,13 +450,13 @@
             <button id="playAgainBtn" class="btn btn-success" style="width: 100%; height: 45px; font-size: 1.1rem; font-weight: bold; margin: 5px 0 0 0;" onclick="app.restartGame()">تلاش دوباره 🔄</button>
         </div>
 
-        <div id="screen-assistant" class="screen hidden" style="width: 100%;">
+        <div id="screen-assistant" style="display:none; width: 100%;">
             <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 1.5rem; text-align: center;">🌟 دستیار ثبت ستاره 🌟</h2>
             <div style="background: #fff; border: 2px dashed #3498db; border-radius: 12px; padding: 20px; margin-bottom: 25px; line-height: 1.8; text-align: justify; direction: rtl;">
                 <span style="font-size: 14pt; font-weight: bold; color: #2c3e50; display: block; margin-bottom: 10px;" id="ast-welcome">سلام قهرمان!</span>
                 <p style="font-size: 11pt; color: #333; margin: 0;">
                     بازی قبلی‌ات با موفقیت تمام شده بود، اما به خاطر قطع شدن اینترنت، ستاره‌ی طلایی‌ات به دفتر کلاسی معلم نرسیده بود. 
-                    اصلاً نگران نباش! نیازی به بازی دوباره نیست. دکمه زیر را بزن تا ستاره‌ی ات ثبت بشه و کارنامه‌ات رو ببینی. 😊
+                    اصلاً نگران نباش! نیازی به بازی دوباره نیست. دکمه زیر را بزن تا ستاره‌ات ثبت بشه و کارنامه‌ات رو ببینی. 😊
                 </p>
             </div>
             <div style="display: flex; flex-direction: column; gap: 10px; background: #f8f9fa; border: 1px solid #bdc3c7; border-radius: 10px; padding: 15px; margin-bottom: 25px; text-align: right; direction: rtl; font-size:12pt;">
@@ -510,7 +476,7 @@
             <button style="width: 100%; height: 50px; background: #2ecc71; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size:13pt;" onclick="submitAssistantStar()">🌟 ثبت ستاره‌ی طلایی من و دریافت کارنامه</button>
         </div>
 
-        <div id="portal-submitting-screen" class="screen hidden" style="background:linear-gradient(135deg,#a1c4fd,#c2e9fb); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
+        <div id="portal-submitting-screen" style="display:none; background:linear-gradient(135deg,#a1c4fd,#c2e9fb); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
             <div class="container" style="max-width: 450px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; text-align: center;">
                 <h3 id="portal-progress-title" style="color:#2c3e50; margin-bottom:15px; font-weight:bold; font-size:16pt;">⏳ در حال ارسال نتایج به دیتابیس کلاس...</h3>
                 <div style="background:#eee; border-radius:10px; height:20px; width:100%; overflow:hidden; margin-bottom:15px; border:1px solid #ccc;">
@@ -574,27 +540,35 @@
                 localStorage.setItem(STORAGE, JSON.stringify(this.state)); 
             },
             showScreen(id) {
-                const screens = ['screen-register', 'screen-game', 'screen-report', 'screen-assistant', 'portal-submitting-screen'];
-                screens.forEach(s => {
-                    const el = document.getElementById(s);
-                    if (el) {
-                        el.classList.add('hidden');
-                        el.classList.remove('active');
-                        el.style.display = '';
-                    }
-                });
-                const target = document.getElementById(id);
-                if (target) {
-                    target.classList.remove('hidden');
-                    target.classList.add('active');
-                    target.style.display = '';
-                }
-                const statsEl = document.getElementById('stats-bar');
+                const registerArea = getEl('registerArea');
+                const gameArea = getEl('gameArea');
+                const reportArea = getEl('reportArea');
+                const assistantArea = getEl('screen-assistant');
+                const submittingArea = getEl('portal-submitting-screen');
+
+                if (registerArea) registerArea.style.display = 'none';
+                if (gameArea) gameArea.style.display = 'none';
+                if (reportArea) reportArea.style.display = 'none';
+                if (assistantArea) assistantArea.style.display = 'none';
+                if (submittingArea) submittingArea.style.display = 'none';
+
+                const statsEl = getEl('stats-bar');
                 if (statsEl) {
-                    statsEl.classList.toggle('hidden', id === 'screen-register' || id === 'screen-assistant' || id === 'portal-submitting-screen');
+                    statsEl.classList.add('hidden');
                 }
-                if (id === 'screen-report') {
+
+                if (id === 'screen-register') {
+                    if (registerArea) registerArea.style.display = 'flex';
+                } else if (id === 'screen-game') {
+                    if (gameArea) gameArea.style.display = 'block';
+                    if (statsEl) statsEl.classList.remove('hidden');
+                } else if (id === 'screen-report') {
+                    if (reportArea) reportArea.style.display = 'block';
                     app.renderReport(app.state.stats.stars >= Portal.requiredStars, app.state.stats.stars);
+                } else if (id === 'screen-assistant') {
+                    if (assistantArea) assistantArea.style.display = 'block';
+                } else if (id === 'portal-submitting-screen') {
+                    if (submittingArea) submittingArea.style.display = 'flex';
                 }
             },
             updateStats() {
@@ -699,17 +673,10 @@
         function DPRResize(){
           if(!canvas) return;
           const rect = canvas.getBoundingClientRect();
+          if(rect.width===0) return;
           const dpr = window.devicePixelRatio||1;
-          let w = rect.width;
-          if (w <= 0) {
-              const card = document.querySelector('.card');
-              if (card) {
-                  w = card.getBoundingClientRect().width - 32;
-              }
-          }
-          if (w <= 0) w = 400;
-          canvas.width = Math.round(w*dpr);
-          canvas.height = Math.round(160*dpr);
+          canvas.width = Math.round(rect.width*dpr);
+          canvas.height = Math.round(rect.height*dpr);
           ctx.setTransform(dpr,0,0,dpr,0,0);
         }
         window.addEventListener('resize', function(){if(canvas){DPRResize();drawCurrentQuestion(false);}});
@@ -783,14 +750,7 @@
 
         function drawAxisFor(q, isExplanation){
           const rect = canvas.getBoundingClientRect();
-          let W = rect.width;
-          if (W <= 0) {
-              const card = document.querySelector('.card');
-              if (card) {
-                  W = card.getBoundingClientRect().width - 32;
-              }
-          }
-          if (W <= 0) W = 400;
+          const W = rect.width;
           const padding = 20, y = 80;
           ctx.clearRect(0,0,canvas.width,canvas.height);
 
@@ -841,15 +801,7 @@
 
         function drawShapeFor(q, isExplanation){
           ctx.clearRect(0,0,canvas.width,canvas.height);
-          const rect = canvas.getBoundingClientRect();
-          let W = rect.width;
-          if (W <= 0) {
-              const card = document.querySelector('.card');
-              if (card) {
-                  W = card.getBoundingClientRect().width - 32;
-              }
-          }
-          if (W <= 0) W = 400;
+          const W = canvas.getBoundingClientRect().width;
           const startX = 20, startY = 20;
           const totalBoxes = q.whole+1;
           const maxRectW = 90, gap = 15;
@@ -1345,7 +1297,7 @@
         document.getElementById('btnShowAnswer').addEventListener('click', showAnswer);
         document.getElementById('btnNewQuestion').addEventListener('click', generateNewQuestionInSameStage); 
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('load', () => {
             initCanvas(); 
             setupPersianInputListeners();
             initApp();
