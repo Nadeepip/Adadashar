@@ -475,7 +475,7 @@
             <div id="portal-submit-badge" style="display:none; background:#fff3e0; border:1px solid #ffe082; color:#e65100; padding:15px; border-radius:12px; margin-bottom:12px; font-weight:bold; font-size:12.5pt; line-height:1.6; text-align:right; width: 100%;"></div>
 
             <div id="portal-goal-reached-badge" style="display:none; background:#e8f5e9; border:2px solid #2e7d32; color:#1b5e20; padding:15px; border-radius:12px; margin-bottom:15px; font-weight:bold; font-size:12.5pt; line-height:1.6; direction:rtl; text-align:right; width: 100%;">
-                🎉 هوراااا قهرمان پرتلاش! هدف تکلیف رو کاملاً ترکوندی و همه‌ی ستاره‌های مورد نیاز رو گرفتی! تو فوق‌العاده‌ای! 🥇 حالا می‌تونی با خیال راحت به پرتال برگردی. خداقوت! ❤️
+                    🎉 هوراااا قهرمان پرتلاش! هدف تکلیف رو کاملاً ترکوندی و همه‌ی ستاره‌های مورد نیاز رو گرفتی! تو فوق‌العاده‌ای! 🥇 حالا می‌تونی با خیال راحت به پرتال برگردی. خداقوت! ❤️
             </div>
 
             <div id="portal-back-instruction" style="display:none; width: 100%;"></div>
@@ -490,7 +490,7 @@
                 <span style="font-size: 14pt; font-weight: bold; color: #2c3e50; display: block; margin-bottom: 10px;" id="ast-welcome">سلام قهرمان!</span>
                 <p style="font-size: 11pt; color: #333; margin: 0;">
                     بازی قبلی‌ات با موفقیت تمام شده بود، اما به خاطر قطع شدن اینترنت، ستاره‌ی طلایی‌ات به دفتر کلاسی معلم نرسیده بود. 
-                    اصلاً نگران نباش! نیازی به بازی دوباره نیست. دکمه زیر را بزن تا ستاره‌ات ثبت بشه و کارنامه‌ات رو ببینی. 😊
+                    اصلاً نگران نباش! نیازی به بازی دوباره نیست. دکمه زیر را بزن تا ستاره‌ی ات ثبت بشه و کارنامه‌ات رو ببینی. 😊
                 </p>
             </div>
             <div style="display: flex; flex-direction: column; gap: 10px; background: #f8f9fa; border: 1px solid #bdc3c7; border-radius: 10px; padding: 15px; margin-bottom: 25px; text-align: right; direction: rtl; font-size:12pt;">
@@ -698,16 +698,12 @@
 
         function DPRResize(){
           if(!canvas) return;
-          let rect = canvas.getBoundingClientRect();
-          let w = rect.width;
-          if (w <= 0) {
-              const card = document.querySelector('.card');
-              if (card) {
-                  w = card.getBoundingClientRect().width - 32;
-              }
-          }
-          if (w <= 0) w = 400;
           const dpr = window.devicePixelRatio||1;
+          const card = document.querySelector('.card');
+          let w = 400;
+          if (card) {
+              w = card.getBoundingClientRect().width - 32;
+          }
           canvas.width = Math.round(w*dpr);
           canvas.height = Math.round(160*dpr);
           ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -782,15 +778,8 @@
         }
 
         function drawAxisFor(q, isExplanation){
-          let rect = canvas.getBoundingClientRect();
-          let W = rect.width;
-          if (W <= 0) {
-              const card = document.querySelector('.card');
-              if (card) {
-                  W = card.getBoundingClientRect().width - 32;
-              }
-          }
-          if (W <= 0) W = 400;
+          const dpr = window.devicePixelRatio||1;
+          const W = canvas.width / dpr;
           const padding = 20, y = 80;
           ctx.clearRect(0,0,canvas.width,canvas.height);
 
@@ -841,15 +830,8 @@
 
         function drawShapeFor(q, isExplanation){
           ctx.clearRect(0,0,canvas.width,canvas.height);
-          let rect = canvas.getBoundingClientRect();
-          let W = rect.width;
-          if (W <= 0) {
-              const card = document.querySelector('.card');
-              if (card) {
-                  W = card.getBoundingClientRect().width - 32;
-              }
-          }
-          if (W <= 0) W = 400;
+          const dpr = window.devicePixelRatio||1;
+          const W = canvas.width / dpr;
           const startX = 20, startY = 20;
           const totalBoxes = q.whole+1;
           const maxRectW = 90, gap = 15;
@@ -970,6 +952,13 @@
           app.updateStats(); 
           updateProgressBar();
           saveCurrentState(); 
+        }
+
+        function drawCurrentQuestion(isExplanation){
+          if(isExplanation === undefined) isExplanation = false;
+          if(!currentQ || currentQ.form === "none") return;
+          if(currentQ.form==="axis") drawAxisFor(currentQ, isExplanation);
+          else drawShapeFor(currentQ, isExplanation);
         }
 
         function saveCurrentState() {
