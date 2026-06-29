@@ -899,6 +899,7 @@
         }
 
         function showQuestionUI(q) {
+          currentQ = q;
           const bWhole = document.getElementById('whole');
           const bNum = document.getElementById('num');
           const bDen = document.getElementById('den');
@@ -969,13 +970,6 @@
           app.updateStats(); 
           updateProgressBar();
           saveCurrentState(); 
-        }
-
-        function drawCurrentQuestion(isExplanation){
-          if(isExplanation === undefined) isExplanation = false;
-          if(!currentQ || currentQ.form === "none") return;
-          if(currentQ.form==="axis") drawAxisFor(currentQ, isExplanation);
-          else drawShapeFor(currentQ, isExplanation);
         }
 
         function saveCurrentState() {
@@ -1129,7 +1123,8 @@
             questions = buildQuestions();
             qIndex = 0;
             tempScore = 0;
-            showQuestionUI(Reflect.get(questions, 0));
+            currentQ = Reflect.get(questions, 0);
+            showQuestionUI(currentQ);
             updateProgressBar();
         }
 
