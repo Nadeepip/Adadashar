@@ -335,7 +335,7 @@
             color: #555;
         }
         @keyframes blink-fill {
-            0% { background-color: #ffe082; transform: scale(1.1;); box-shadow: 0 0 10px #f39c12; }
+            0% { background-color: #ffe082; transform: scale(1.1); box-shadow: 0 0 10px #f39c12; }
             50% { background-color: #f1c40f; transform: scale(1.15); border-color: #d35400; }
             100% { background-color: #d4edda; transform: scale(1); box-shadow: none; }
         }
@@ -1317,21 +1317,21 @@
                     try {
                         answerKeyUsedCount = 0;
                         app.state.reportShown = false;
+                        app.showScreen('screen-game');
                         const activeState = checkSavedUnfinishedState();
                         if (activeState) {
                             app.restore();
                         } else {
                             startNewGame();
                         }
-                        app.showScreen('screen-game');
                         app.updateStats();
                         app.save();
                     } catch (e) {
                         localStorage.removeItem(GAME_STATE_STORAGE);
                         app.state.reportShown = false;
                         app.save();
-                        startNewGame();
                         app.showScreen('screen-game');
+                        startNewGame();
                         app.updateStats();
                         app.save();
                     }
