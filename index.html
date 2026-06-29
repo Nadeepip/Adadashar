@@ -475,7 +475,7 @@
             <div id="portal-submit-badge" style="display:none; background:#fff3e0; border:1px solid #ffe082; color:#e65100; padding:15px; border-radius:12px; margin-bottom:12px; font-weight:bold; font-size:12.5pt; line-height:1.6; text-align:right; width: 100%;"></div>
 
             <div id="portal-goal-reached-badge" style="display:none; background:#e8f5e9; border:2px solid #2e7d32; color:#1b5e20; padding:15px; border-radius:12px; margin-bottom:15px; font-weight:bold; font-size:12.5pt; line-height:1.6; direction:rtl; text-align:right; width: 100%;">
-                    🎉 هوراااا قهرمان پرتلاش! هدف تکلیف رو کاملاً ترکوندی و همه‌ی ستاره‌های مورد نیاز رو گرفتی! تو فوق‌العاده‌ای! 🥇 حالا می‌تونی با خیال راحت به پرتال برگردی. خداقوت! ❤️
+                🎉 هوراااا قهرمان پرتلاش! هدف تکلیف رو کاملاً ترکوندی و همه‌ی ستاره‌های مورد نیاز رو گرفتی! تو فوق‌العاده‌ای! 🥇 حالا می‌تونی با خیال راحت به پرتال برگردی. خداقوت! ❤️
             </div>
 
             <div id="portal-back-instruction" style="display:none; width: 100%;"></div>
@@ -698,12 +698,16 @@
 
         function DPRResize(){
           if(!canvas) return;
+          const rect = canvas.getBoundingClientRect();
           const dpr = window.devicePixelRatio||1;
-          const card = document.querySelector('.card');
-          let w = 400;
-          if (card) {
-              w = card.getBoundingClientRect().width - 32;
+          let w = rect.width;
+          if (w <= 0) {
+              const card = document.querySelector('.card');
+              if (card) {
+                  w = card.getBoundingClientRect().width - 32;
+              }
           }
+          if (w <= 0) w = 400;
           canvas.width = Math.round(w*dpr);
           canvas.height = Math.round(160*dpr);
           ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -778,8 +782,15 @@
         }
 
         function drawAxisFor(q, isExplanation){
-          const dpr = window.devicePixelRatio||1;
-          const W = canvas.width / dpr;
+          const rect = canvas.getBoundingClientRect();
+          let W = rect.width;
+          if (W <= 0) {
+              const card = document.querySelector('.card');
+              if (card) {
+                  W = card.getBoundingClientRect().width - 32;
+              }
+          }
+          if (W <= 0) W = 400;
           const padding = 20, y = 80;
           ctx.clearRect(0,0,canvas.width,canvas.height);
 
@@ -830,8 +841,15 @@
 
         function drawShapeFor(q, isExplanation){
           ctx.clearRect(0,0,canvas.width,canvas.height);
-          const dpr = window.devicePixelRatio||1;
-          const W = canvas.width / dpr;
+          const rect = canvas.getBoundingClientRect();
+          let W = rect.width;
+          if (W <= 0) {
+              const card = document.querySelector('.card');
+              if (card) {
+                  W = card.getBoundingClientRect().width - 32;
+              }
+          }
+          if (W <= 0) W = 400;
           const startX = 20, startY = 20;
           const totalBoxes = q.whole+1;
           const maxRectW = 90, gap = 15;
@@ -952,13 +970,6 @@
           app.updateStats(); 
           updateProgressBar();
           saveCurrentState(); 
-        }
-
-        function drawCurrentQuestion(isExplanation){
-          if(isExplanation === undefined) isExplanation = false;
-          if(!currentQ || currentQ.form === "none") return;
-          if(currentQ.form==="axis") drawAxisFor(currentQ, isExplanation);
-          else drawShapeFor(currentQ, isExplanation);
         }
 
         function saveCurrentState() {
@@ -1334,17 +1345,11 @@
         document.getElementById('btnShowAnswer').addEventListener('click', showAnswer);
         document.getElementById('btnNewQuestion').addEventListener('click', generateNewQuestionInSameStage); 
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                initCanvas(); 
-                setupPersianInputListeners();
-                initApp();
-            });
-        } else {
+        window.addEventListener('DOMContentLoaded', () => {
             initCanvas(); 
             setupPersianInputListeners();
             initApp();
-        }
+        });
     </script>
     <script>
         if ('serviceWorker' in navigator) {
