@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>عدد اعشاری — دبستان معاد خرگوشی</title>
+    <script src="supabase.js" defer></script>
+    <script src="game-db.js" defer></script>
+    <style>
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('Vazirmatn-Regular.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('Vazirmatn-Bold.woff2') format('woff2');
+            font-weight: bold;
+            font-style: normal;
+        }
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .screen {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card {
+            width: 100%;
+            max-width: 500px;
+            background: #fff;
+            border-radius: 18px;
+            padding: 18px 12px;
+            border: 4px solid #ff4081;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+            margin: auto;
+        }
+        h1 {
+            font-size: 18px;
+            color: #d81b60;
+            text-align: center;
+            margin: 6px 0 12px;
+            font-weight: 900;
+        }
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        input {
+            padding: 2px;
+            border: 3px solid #ff4081;
+            text-align: center;
+            outline: none; 
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            font-weight: bold;
+            direction: rtl;
+        }
+        input::-webkit-input-placeholder {
+            font-size: 9px;
+            font-weight: 400;
+            color: #777;
+            letter-spacing: -0.5px;
+        }
+        input::-moz-placeholder {
+            font-size: 9px;
+            font-weight: 400;
+            color: #777;
+            letter-spacing: -0.5px;
+        }
+        input:-ms-input-placeholder {
+            font-size: 9px;
+            font-weight: 400;
+            color: #777;
+            letter-spacing: -0.5px;
+        }
+        input::placeholder {
+            font-size: 9px;
+            font-weight: 400;
+            color: #777;
+            letter-spacing: -0.5px;
+        }
+        .box-input {
+            width: 40px;
+            height: 38px;
+            font-size: 16px;
+            border-radius: 8px;
+        }
+        .fracInput {
+            width: 38px;
+            height: 26px;
+            font-size: 15px;
+            border-radius: 6px;
+        }
+        input.correct-input {
+            background-color: #e8f5e9 !important;
+            border-color: #4caf50 !important;
+            color: #2e7d32 !important;
+        }
+        input.wrong-input {
+            background-color: #ffebee !important;
+            border-color: #f44336 !important;
+            color: #c62828 !important;
+            cursor: pointer;
+        }
+        input.empty-input {
+            background-color: #e3f2fd !important;
+            border-color: #2196f3 !important;
+            color: #0d47a1 !important;
+            cursor: pointer;
+        }
+        input:disabled {
+            background-color: #ffe0e0;
+            color: #d32f2f;
+            border-color: #d32f2f;
+        } 
+        .auto-filled:disabled {
+            background-color: #e3f2fd !important;
+            color: #1565c0 !important;
+            border-color: #1e88e5 !important;
+            opacity: 1 !important;
+        }
+        button {
+            background: #f50057;
+            color: #fff;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 6px 14px rgba(245,0,87,0.15);
+            transition: background-color 0.2s, opacity 0.2s;
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-check {
+            background: #1e88e5;
+        }
+        .btn-answer {
+            background: #FF9800;
+        }
+        .btn-new-q {
+            background: #f44336;
+        } 
+        .btn-next {
+            background: #4CAF50;
+        }
+        .btn-start-new {
+            background: #8bc34a;
+            margin-top: 10px;
+            width: 100%;
+        }
+        #stats-bar {
+            width: 100%;
+            height: 50px;
+            background: #34495e;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 900;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #top-ui-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px;
+            margin-top: 50px;
+            z-index: 1000;
+            position: sticky;
+            top: 0;
+            background-color: #f0f4f8;
+            transition: all 0.3s;
+        }
+        #progressBarContainer {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        #progressFill {
+            height: 100%;
+            background: #4CAF50;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        #rabbitIcon {
+            position: absolute;
+            top: -14px;
+            transform: translateX(-50%);
+            font-size: 20px;
+            transition: left 0.3s ease;
+        }
+        .canvasWrap {
+            border: 3px dashed #ff4382;
+            border-radius: 12px;
+            padding: 10px;
+            background: #fff1f9;
+            overflow: auto;
+            margin-bottom: 10px;
+            position: relative;
+            height: 180px;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 160px;
+            border-radius: 8px;
+            background: #fff;
+        }
+        .inputs {
+            display: flex;
+            direction: ltr;
+            gap: 2px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: nowrap;
+            background: #fff8eb;
+            padding: 10px 2px;
+            border-radius: 12px;
+            border: 2px dashed #ff9800;
+        }
+        .flex-row {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .fraction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .fraction .bar {
+            width: 42px;
+            height: 4px;
+            background: #000;
+            border-radius: 6px;
+        }
+        .math-sign {
+            font-size: 16px;
+            font-weight: 900;
+            color: #d81b60;
+            margin: 0 2px;
+        }
+        .separator {
+            font-size: 22px;
+            font-weight: 900;
+            color: #1e88e5;
+            line-height: 0;
+            margin: 0 1px;
+        }
+        #feedback {
+            min-height: 36px;
+            font-weight: 900;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+        #feedback.correct {
+            color: #2e7d32;
+        }
+        #feedback.wrong {
+            color: #e53935;
+        }
+        .small {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+        .report-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 350px;
+            width: 90%;
+            text-align: right;
+            margin-top: 70px;
+        }
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dotted #eee;
+        }
+        .report-item span:first-child {
+            font-weight: bold;
+            color: #555;
+        }
+        @keyframes blink-fill {
+            0% { background-color: #ffe082; transform: scale(1.1); box-shadow: 0 0 10px #f39c12; }
+            50% { background-color: #f1c40f; transform: scale(1.15); border-color: #d35400; }
+            100% { background-color: #d4edda; transform: scale(1); box-shadow: none; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="Screen-Loading" style="display:none; background:linear-gradient(135deg,#a1c4fd,#c2e9fb); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
+        <div style="font-size: 3.5rem; margin-bottom: 15px;">🐰</div>
+        <h1 style="color:#2c3e50; font-size:24pt; margin-bottom:30px; font-weight: bold;">عدد اعشاری</h1>
+        <div style="background:#e0e0e0; border-radius:12px; height:18px; width:80%; max-width:400px; overflow:hidden; margin-bottom:18px; border:2px solid #2c3e50; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+            <div id="portal-loading-bar" style="background: linear-gradient(90deg, #ff007f, #aa00ff, #00b0ff); width:0%; height:100%; transition:width 0.3s ease; box-shadow: 0 0 10px rgba(170,0,255,0.5);"></div>
+        </div>
+        <p id="portal-loading-text" style="font-size:13pt; color:#2c3e50; font-weight:bold;"></p>
+    </div>
+
+    <div id="stats-bar" class="hidden">
+        <div>👤 <span id="disp-name">-</span></div>
+        <div style="display:flex; gap:15px;">
+            <span>🎮 <span id="disp-games">۰</span></span>
+            <span>⭐ <span id="disp-stars">۰</span></span>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 60px;">
+        <div id="screen-register" class="screen">
+            <span class="school-name" id="portal-school-title" style="font-size: 0.85em; color: #7f8c8d; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 8px; display: block; width: 100%; text-align: center;">دبستان معاد خرگوشی</span>
+            <h1 style="font-size: 18px; color: #d81b60; text-align: center; margin: 6px 0 12px; font-weight: 900;">عدد اعشاری</h1>
+            
+            <div id="register-container">
+                <div id="portal-welcome-section">
+                    <h1 style="color:#2c3e50; font-size:1.5rem; margin-bottom:10px;">سلام دانش‌آموز زرنگم! 🌟</h1>
+                    <p style="color:#555; margin-bottom:15px; font-size:0.95em;">بیا با هم عددهای اعشاری رو تمرین کنیم و ستاره بگیریم!</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px; background: #f8f9fa; border-radius: 10px; padding: 15px; border: 1px dashed #bdc3c7; margin: 15px auto; text-align: right; direction: rtl; font-size: 1rem; width: 100%; max-width: 280px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>👤 نامت:</span>
+                            <span id="portal-student-name" style="font-weight:bold; color:#2c3e50;">---</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>🎮 تعداد تلاش‌های قبلی:</span>
+                            <span id="portal-prev-plays" style="font-weight:bold; color:#e67e22;">۰</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>⭐ ستاره‌های ثبت‌شده:</span>
+                            <span id="portal-prev-stars" style="font-weight:bold; color:#f39c12;">۰ ⭐</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:#27ae60; border-top:1px dashed #bdc3c7; padding-top:8px; margin-top:5px;">
+                            <span>🎯 ستاره مورد نیاز تکلیف:</span>
+                            <span id="portal-req-stars">۰ ⭐</span>
+                        </div>
+                    </div>
+                </div>
+                <button id="startGame" style="background:#2ecc71; color:white; padding:12px 20px; border:none; border-radius:10px; cursor:pointer; width:100%; max-width:250px; display:block; margin:20px auto 0; font-weight: bold; font-size: 1.1rem; transition: background 0.3s;">شروع بازی تکلیف 🎮</button>
+            </div>
+
+            <div id="portal-error-section" style="display:none; text-align:center; padding:20px; max-width: 450px; margin: 20px auto; background: white; border-radius: 12px; box-shadow:0 6px 18px rgba(0,0,0,0.12);">
+                <div style="font-size:2.5rem; margin-bottom:10px;">⚠️</div>
+                <h3 id="portal-error-title" style="color:#d32f2f; margin-bottom:8px; font-weight:bold; font-size:15pt;">خطا در اتصال به پرتال کلاس</h3>
+                <p id="portal-error-desc" style="color:#555; font-size:12pt; margin-bottom:15px; line-height:1.6;">جهت بارگذاری مشخصات و تکالیفت، اتصال به اینترنت الزامی است. لطفا شبکه‌ات را بررسی کن و مجدداً تلاش کن.</p>
+                <button id="portal-retry-auth-btn" style="background:#1e90ff; color: white; padding: 10px 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="retryAuthentication()">🔄 تلاش مجدد برای اتصال</button>
+            </div>
+        </div>
+
+        <div id="screen-game" class="screen hidden">
+            <div id="progressBarContainer">
+                <div id="rabbitIcon">🐰</div>
+                <div id="progressFill"></div>
+            </div>
+            
+            <div class="small" style="margin-bottom: 8px;">مرحله: <span id="currentStageText">۱ از ۱۲</span></div>
+
+            <div class="canvasWrap" id="canvasWrap">
+                <canvas id="c"></canvas>
+            </div>
+
+            <div class="inputs" id="inputsRow">
+                <div id="baseBlock" class="flex-row">
+                    <input id="whole" class="box-input" type="text" inputmode="numeric" autocomplete="off" placeholder="عدد صحیح">
+                    <div class="fraction">
+                        <input id="num" class="fracInput" type="text" inputmode="numeric" autocomplete="off" placeholder="صورت">
+                        <div class="bar"></div>
+                        <input id="den" class="fracInput" type="text" inputmode="numeric" autocomplete="off" placeholder="مخرج">
+                    </div>
+                </div>
+
+                <div id="eqSign1" class="math-sign">=</div>
+
+                <div id="eqBlock" class="flex-row" style="display:none;">
+                    <input id="eqWhole" class="box-input" type="text" inputmode="numeric" autocomplete="off" placeholder="عدد صحیح">
+                    <div class="fraction">
+                        <input id="eqNum" class="fracInput" type="text" inputmode="numeric" autocomplete="off" placeholder="صورت">
+                        <div class="bar"></div>
+                        <input id="eqDen" class="fracInput" type="text" inputmode="numeric" autocomplete="off" placeholder="مخرج">
+                    </div>
+                </div>
+
+                <div id="eqSign2" class="math-sign" style="display:none;">=</div>
+
+                <div id="decBlock" class="flex-row">
+                    <input id="decWhole" class="box-input" type="text" inputmode="numeric" autocomplete="off" placeholder="عدد صحیح">
+                    <span class="separator">٫</span>
+                    <input id="decPart" class="box-input" type="text" inputmode="numeric" autocomplete="off" placeholder="دهم">
+                </div>
+            </div>
+
+            <div style="text-align:center; display: flex; justify-content: space-around; gap: 6px; width: 100%;">
+                <button id="btnCheck" class="btn-check" style="width: 30%;">بررسی</button>
+                <button id="btnShowAnswer" class="btn-answer" style="display:none; width: 30%;">جواب</button>
+                <button id="btnNewQuestion" class="btn-new-q" style="display:none; width: 30%;">سوال جدید</button>
+                <button id="nextBtn" class="btn-next" style="display:none; width: 30%;">مرحله بعد</button>
+            </div>
+
+            <div id="feedback" aria-live="assertive"></div>
+        </div>
+
+        <div id="screen-report" class="screen hidden" style="width: 100%;">
+            <h3 style="text-align:center; margin-bottom: 15px; color: #d81b60;">کارنامه درخشانت 🌟</h3>
+            
+            <div style="text-align: right; background: #fafafa; padding: 15px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 20px; font-weight: bold; line-height: 1.8;">
+                <div class="report-item"><span>نام تمرین:</span><span>عدد اعشاری</span></div>
+                <div class="report-item"><span>مدرسه:</span><span id="rep-school">دبستان معاد خرگوشی</span></div>
+                <div class="report-item"><span>دانش‌آموز:</span><span id="rep-name">---</span></div>
+                <div class="report-item"><span>تاریخ و زمان:</span><span id="rep-time" style="direction: ltr; font-size:0.9rem;">---</span></div>
+                <div class="report-item"><span>تعداد تلاش‌ها:</span><span id="rep-games">۰</span></div>
+                <div class="report-item"><span>ستاره‌های گرفته‌شده:</span><span>⭐ <span id="rep-stars">۰</span></span></div>
+                <div class="report-item" id="portal-req-stars-row" style="display:none; font-weight:bold; color:#27ae60; border-top:1px dashed #bdc3c7; padding-top:8px; margin-top:5px; justify-content:space-between;">
+                    <span>🎯 ستاره مورد نیاز تکلیف:</span>
+                    <span id="rep-req-stars">۰ ⭐</span>
+                </div>
+            </div>
+
+            <div id="portal-submit-badge" style="display:none; background:#fff3e0; border:1px solid #ffe082; color:#e65100; padding:15px; border-radius:12px; margin-bottom:12px; font-weight:bold; font-size:12.5pt; line-height:1.6; text-align:right; width: 100%;"></div>
+
+            <div id="portal-goal-reached-badge" style="display:none; background:#e8f5e9; border:2px solid #2e7d32; color:#1b5e20; padding:15px; border-radius:12px; margin-bottom:15px; font-weight:bold; font-size:12.5pt; line-height:1.6; direction:rtl; text-align:right; width: 100%;">
+                🎉 هوراااا قهرمان پرتلاش! هدف تکلیف رو کاملاً ترکوندی و همه‌ی ستاره‌های مورد نیاز رو گرفتی! تو فوق‌العاده‌ای! 🥇 حالا می‌تونی با خیال راحت به پرتال برگردی. خداقوت! ❤️
+            </div>
+
+            <div id="portal-back-instruction" style="display:none; width: 100%;"></div>
+
+            <br>
+            <button id="playAgainBtn" class="btn btn-success" style="width: 100%; height: 45px; font-size: 1.1rem; font-weight: bold; margin: 5px 0 0 0;" onclick="app.restartGame()">تلاش دوباره 🔄</button>
+        </div>
+
+        <div id="screen-assistant" class="screen hidden" style="width: 100%;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 1.5rem; text-align: center;">🌟 دستیار ثبت ستاره 🌟</h2>
+            <div style="background: #fff; border: 2px dashed #3498db; border-radius: 12px; padding: 20px; margin-bottom: 25px; line-height: 1.8; text-align: justify; direction: rtl;">
+                <span style="font-size: 14pt; font-weight: bold; color: #2c3e50; display: block; margin-bottom: 10px;" id="ast-welcome">سلام قهرمان!</span>
+                <p style="font-size: 11pt; color: #333; margin: 0;">
+                    بازی قبلی‌ات با موفقیت تمام شده بود، اما به خاطر قطع شدن اینترنت، ستاره‌ی طلایی‌ات به دفتر کلاسی معلم نرسیده بود. 
+                    اصلاً نگران نباش! نیازی به بازی دوباره نیست. دکمه زیر را بزن تا ستاره‌ات ثبت بشه و کارنامه‌ات رو ببینی. 😊
+                </p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; background: #f8f9fa; border: 1px solid #bdc3c7; border-radius: 10px; padding: 15px; margin-bottom: 25px; text-align: right; direction: rtl; font-size:12pt;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>👤 نامت:</span>
+                    <span id="ast-name" style="font-weight:bold; color:#2c3e50;">---</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>⭐ ستاره‌های ثبت‌شده قبلی:</span>
+                    <span id="ast-stars" style="font-weight:bold; color:#f39c12;">۰ ⭐</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>🎯 ستاره هدف تکلیف:</span>
+                    <span id="ast-req-stars" style="font-weight:bold; color:#27ae60;">۰ ⭐</span>
+                </div>
+            </div>
+            <button style="width: 100%; height: 50px; background: #2ecc71; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size:13pt;" onclick="submitAssistantStar()">🌟 ثبت ستاره‌ی طلایی من و دریافت کارنامه</button>
+        </div>
+
+        <div id="portal-submitting-screen" class="screen hidden" style="background:linear-gradient(135deg,#a1c4fd,#c2e9fb); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
+            <div class="container" style="max-width: 450px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; text-align: center;">
+                <h3 id="portal-progress-title" style="color:#2c3e50; margin-bottom:15px; font-weight:bold; font-size:16pt;">⏳ در حال ارسال نتایج به دیتابیس کلاس...</h3>
+                <div style="background:#eee; border-radius:10px; height:20px; width:100%; overflow:hidden; margin-bottom:15px; border:1px solid #ccc;">
+                    <div id="portal-progress-bar" style="background:linear-gradient(90deg, #ff007f, #aa00ff, #00b0ff); width:0%; height:100%; transition:width 0.2s;"></div>
+                </div>
+                <p id="portal-submit-status-text" style="font-size:12pt; color:#555; font-weight:bold; line-height:1.6; direction:rtl;"></p>
+                <button id="portal-retry-submit-btn" style="display:none; margin:15px auto 0; background:#e74c3c; color: white; padding: 10px 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;" onclick="retrySubmission()">🔄 تلاش مجدد برای ارسال</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            school: "دبستان معاد خرگوشی",
+            teacherPhone: "989392291209",
+            QUESTIONS_PER_GAME: 12,
+            GAME_NAME: "عدد اعشاری"
+        };
+
+        let STORAGE = 'studentProfile_DecimalNumber_Default';
+        let GAME_STATE_STORAGE = 'gameState_DecimalNumber_Default';
+
+        let canvas, ctx;
+        let playerName = "";
+        let totalGames = 0, totalStars = 0;
+        let questions = new Array();
+        let qIndex = 0;
+        let currentQ = null;
+        let answerKeyUsedCount = 0;
+        let tempScore = 0;
+
+        const toPersian = num => String(num).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        const toEnglish = str => {
+            if(!str) return '';
+            return String(str).trim()
+                .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+                .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)) 
+                .replace(/[^\d]/g, '');
+        };
+
+        const getJalaliDateTime = () => {
+            const d = new Date();
+            const dateString = d.toLocaleDateString('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            const reorderedDate = dateString.split('/').reverse().join('-'); 
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            return reorderedDate + ' ' + d.toLocaleTimeString('fa-IR', timeOptions);
+        };
+
+        const getEl = id => document.getElementById(id);
+
+        const app = {
+            state: { user: null, stats: { games: 0, stars: 0 }, lastHelpUsed: false, isTutorialMode: false, reportShown: false },
+            init() {
+                authenticatePortalStudent();
+            },
+            save() { 
+                this.state.user = playerName;
+                this.state.stats.games = totalGames;
+                this.state.stats.stars = totalStars;
+                this.state.lastHelpUsed = (answerKeyUsedCount > 0);
+                localStorage.setItem(STORAGE, JSON.stringify(this.state)); 
+            },
+            showScreen(id) {
+                const screens = ['screen-register', 'screen-game', 'screen-report', 'screen-assistant', 'portal-submitting-screen'];
+                screens.forEach(s => {
+                    const el = document.getElementById(s);
+                    if (el) {
+                        el.classList.add('hidden');
+                        el.classList.remove('active');
+                        el.style.display = '';
+                    }
+                });
+                const target = document.getElementById(id);
+                if (target) {
+                    target.classList.remove('hidden');
+                    target.classList.add('active');
+                    target.style.display = '';
+                }
+                const statsEl = document.getElementById('stats-bar');
+                if (statsEl) {
+                    statsEl.classList.toggle('hidden', id === 'screen-register' || id === 'screen-assistant' || id === 'portal-submitting-screen');
+                }
+                if (id === 'screen-report') {
+                    app.renderReport(app.state.stats.stars >= Portal.requiredStars, app.state.stats.stars);
+                }
+            },
+            updateStats() {
+                if (this.state.user) {
+                    getEl('disp-name').innerText = this.state.user;
+                    getEl('disp-games').innerText = toPersian(this.state.stats.games);
+                    getEl('disp-stars').innerText = toPersian(this.state.stats.stars);
+                }
+            },
+            restore() {
+                const d = checkSavedUnfinishedState();
+                if (d) {
+                    qIndex = d.qIndex;
+                    tempScore = d.tempScore;
+                    questions = d.questions;
+                    currentQ = Reflect.get(questions, qIndex);
+                    showQuestionUI(currentQ);
+                }
+            },
+            renderReport(goalReached, currentStars) {
+                const stars = currentStars !== undefined ? currentStars : app.state.stats.stars;
+                const games = app.state.stats.games;
+                const dateText = getJalaliDateTime();
+
+                getEl('rep-name').innerText = app.state.user; 
+                getEl('rep-time').innerText = toPersian(dateText); 
+                getEl('rep-games').innerText = toPersian(games); 
+                getEl('rep-stars').innerText = toPersian(stars);
+
+                const repSchool = getEl('rep-school');
+                if (repSchool) {
+                    repSchool.innerText = Portal.studentName ? (getEl('portal-school-title').textContent || CONFIG.school) : CONFIG.school;
+                }
+
+                const repReqStarsRow = getEl('portal-req-stars-row');
+                const repReqStars = getEl('rep-req-stars');
+                if (repReqStarsRow && repReqStars) {
+                    repReqStarsRow.style.display = 'flex';
+                    repReqStars.innerText = toPersian(Portal.requiredStars) + ' ⭐';
+                }
+
+                const goalBadge = getEl('portal-goal-reached-badge');
+                const submitBadge = getEl('portal-submit-badge');
+                const backInstruction = getEl('portal-back-instruction');
+                const playAgainBtn = getEl('playAgainBtn');
+
+                goalBadge.style.display = 'none';
+                submitBadge.style.display = 'none';
+                backInstruction.style.display = 'none';
+                playAgainBtn.style.display = 'block';
+
+                if (answerKeyUsedCount > 0) {
+                    playAgainBtn.innerText = "بازی دوباره بدون کمک 💡";
+                    backInstruction.innerHTML = `
+                        <div style="background:#fff3e0; border:1px solid #ffe082; color:#e65100; padding:12px; border-radius:12px; margin-top:10px; font-size:11.5pt; line-height:1.6; text-align:center; width: 100%;">
+                            💡 این دور بازی‌ات آموزشی بود و برای گرفتن ستاره باید بدون کمک حلش کنی. دکمه پایین رو بزن تا بدون کمک تلاش کنی!
+                        </div>
+                    `;
+                    backInstruction.style.display = 'block';
+                } else if (goalReached) {
+                    goalBadge.style.display = 'block';
+                    playAgainBtn.style.display = 'none';
+                    backInstruction.innerHTML = `
+                        <div style="background:#e8f5e9; border:1px solid #2e7d32; color:#1b5e20; padding:15px; border-radius:12px; margin-top:10px; font-weight:bold; font-size:12pt; line-height:1.6; text-align:center; width: 100%;">
+                            📱 آفرین! تکلیف با موفقیت تکمیل شد.<br>
+                            حالا با زدن <b>دکمه بازگشت (Back) گوشی</b> به پرتال کلاس برگرد.
+                        </div>
+                    `;
+                    backInstruction.style.display = 'block';
+                } else {
+                    const remaining = Portal.requiredStars - stars;
+                    submitBadge.innerHTML = `✨ آفرین دانش‌آموز زرنگم! تو <b>${toPersian(stars)}</b> ستاره از <b>${toPersian(Portal.requiredStars)}</b> ستاره‌ی این تکلیف رو گرفتی! ⭐ فقط به <b>${toPersian(remaining)}</b> ستاره‌ی دیگه نیاز داری تا تیک تکلیف بخوره. بدو برو بعدی رو حل کن! 🏆`;
+                    submitBadge.style.display = 'block';
+                    playAgainBtn.innerText = "گرفتن ستاره بیشتر 🎮";
+                    backInstruction.innerHTML = `
+                        <div style="background:#fff3e0; border:1px solid #ffe082; color:#e65100; padding:12px; border-radius:12px; margin-top:10px; font-size:11.5pt; line-height:1.6; text-align:center; width: 100%;">
+                            💡 اگر می‌خواهی بعداً بازی کنی، با زدن <b>دکمه بازگشت (Back) گوشی</b> به پرتال برگرد.
+                        </div>
+                    `;
+                    backInstruction.style.display = 'block';
+                }
+            },
+            restartGame() {
+                app.state.reportShown = false;
+                answerKeyUsedCount = 0;
+                localStorage.removeItem(GAME_STATE_STORAGE);
+                app.save();
+                app.showScreen('screen-game');
+                startNewGame();
+            }
+        };
+
+        function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+        function initCanvas(){
+          canvas = document.getElementById('c');
+          ctx = canvas.getContext('2d');
+          DPRResize();
+        }
+
+        function DPRResize(){
+          if(!canvas) return;
+          const rect = canvas.getBoundingClientRect();
+          if(rect.width===0) return;
+          const dpr = window.devicePixelRatio||1;
+          canvas.width = Math.round(rect.width*dpr);
+          canvas.height = Math.round(rect.height*dpr);
+          ctx.setTransform(dpr,0,0,dpr,0,0);
+        }
+        window.addEventListener('resize', function(){if(canvas){DPRResize();drawCurrentQuestion(false);}});
+
+        function generateSingleQuestion(stageIndex) {
+            let kind = "fraction", form = "none", den = 10, whole = 0, num = 1;
+
+            if(stageIndex === 0) { kind="fraction"; form="shape"; den=10; whole=0; num=rand(1,9); }
+            else if(stageIndex === 1) { kind="fraction"; form="axis"; den=10; whole=0; num=rand(1,9); }
+            else if(stageIndex === 2) { kind="mixed"; form="shape"; den=10; whole=rand(1,2); num=rand(1,9); }
+            else if(stageIndex === 3) { kind="mixed"; form="axis"; den=10; whole=rand(1,2); num=rand(1,9); }
+            else if(stageIndex === 4) { kind="fraction"; form="none"; den=10; whole=0; num=rand(1,9); }
+            else if(stageIndex === 5) { kind="fraction"; form="none"; den=10; whole=0; num=rand(1,9); }
+            else if(stageIndex === 6) { kind="mixed"; form="none"; den=10; whole=rand(1,3); num=rand(1,9); }
+            else if(stageIndex === 7) { kind="mixed"; form="none"; den=10; whole=rand(1,3); num=rand(1,9); }
+            else if(stageIndex === 8) { kind="fraction"; form="none"; den=2; whole=0; num=1; }
+            else if(stageIndex === 9) { kind="fraction"; form="none"; den=5; whole=0; num=rand(1,4); }
+            else if(stageIndex === 10) { kind="mixed"; form="none"; den=2; whole=rand(1,3); num=1; }
+            else if(stageIndex === 11) { kind="mixed"; form="none"; den=5; whole=rand(1,3); num=rand(1,4); }
+
+            let obj = new Object();
+            obj.kind = kind; obj.whole = whole; obj.num = num; obj.den = den; obj.form = form; 
+            obj.attempts = 0; obj.scored = false;
+            return obj;
+        }
+
+        function buildQuestions(){
+            let arr = new Array();
+            for(let i = 0; i < CONFIG.QUESTIONS_PER_GAME; i++){
+                arr.push(generateSingleQuestion(i));
+            }
+            return arr;
+        }
+
+        function updateProgressBar() {
+            const percentage = (qIndex / CONFIG.QUESTIONS_PER_GAME) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('rabbitIcon').style.left = "calc(" + percentage + "% - 14px)"; 
+            if (qIndex === CONFIG.QUESTIONS_PER_GAME) document.getElementById('rabbitIcon').style.left = "calc(100% - 28px)"; 
+            document.getElementById('currentStageText').textContent = toPersian(qIndex+1) + " از " + toPersian(CONFIG.QUESTIONS_PER_GAME);
+        }
+
+        function setupPersianInputListeners() {
+            const inputIds = "whole,num,den,eqWhole,eqNum,eqDen,decWhole,decPart".split(",");
+            for(let i=0; i<inputIds.length; i++){
+                const elId = Reflect.get(inputIds, i);
+                const el = document.getElementById(elId);
+                if(el){
+                    el.addEventListener('input', function(e) {
+                        e.target.value = toPersian(toEnglish(e.target.value));
+                        e.target.classList.remove('wrong-input', 'correct-input', 'empty-input');
+                    });
+                    el.addEventListener('click', function(e) {
+                        if (e.target.classList.contains('wrong-input') || e.target.classList.contains('empty-input')) {
+                            e.target.value = '';
+                            e.target.classList.remove('wrong-input', 'empty-input');
+                        }
+                    });
+                }
+            }
+        }
+
+        function drawArc(ctx, startX, endX, y, height, color) {
+            const midX = (startX + endX) / 2;
+            const radius = Math.abs(endX - startX) / 2;
+            ctx.strokeStyle = color; ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(midX, y + height, radius, Math.PI, 0, false);
+            ctx.stroke();
+        }
+
+        function drawAxisFor(q, isExplanation){
+          const rect = canvas.getBoundingClientRect();
+          const W = rect.width;
+          const padding = 20, y = 80;
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+
+          const maxWholeUnits = q.whole + 1;
+          const axisLength = W - 2 * padding;
+          const unitLength = axisLength / maxWholeUnits;
+
+          ctx.font="14px Vazirmatn"; ctx.textAlign="center"; 
+
+          for(let i=0; i<=maxWholeUnits * q.den; i++){
+            const x = padding + i * (unitLength / q.den);
+            if(i % q.den === 0){
+              ctx.strokeStyle="#43a047"; ctx.lineWidth=3;
+              ctx.beginPath(); ctx.moveTo(x,y-12); ctx.lineTo(x,y+12); ctx.stroke();
+              ctx.fillStyle="#43a047";
+              ctx.fillText(toPersian(i/q.den),x,y+30);
+            } else {
+              ctx.strokeStyle="#bdbdbd"; ctx.lineWidth=1.2;
+              ctx.beginPath(); ctx.moveTo(x,y-6); ctx.lineTo(x,y+6); ctx.stroke();
+            }
+          }
+
+          ctx.strokeStyle="#1e88e5"; ctx.lineWidth=5;
+          ctx.beginPath(); ctx.moveTo(padding,y); ctx.lineTo(W-padding,y); ctx.stroke();
+          
+          const finalFractionValue = (q.whole * q.den + q.num) / q.den;
+          const finalX = padding + finalFractionValue * unitLength;
+          const arrowY = y - 16; 
+          ctx.fillStyle="#d32f2f";
+          ctx.beginPath(); ctx.moveTo(finalX,arrowY); ctx.lineTo(finalX-8,arrowY-12); ctx.lineTo(finalX+8,arrowY-12); ctx.closePath(); ctx.fill();
+
+          if (isExplanation) {
+              const wholeColor = "#388e3c,#fbc02d,#1976d2,#d81b60".split(",");
+              for (let i = 0; i < q.whole; i++) {
+                  const startX = padding + i * unitLength;
+                  const endX = padding + (i + 1) * unitLength;
+                  drawArc(ctx, startX, endX, y, -20, Reflect.get(wholeColor, i % 4));
+              }
+              if (q.num > 0) {
+                  const startXBase = padding + q.whole * unitLength; 
+                  const segmentLength = unitLength / q.den;
+                  for (let i = 0; i < q.num; i++) {
+                      drawArc(ctx, startXBase + i * segmentLength, startXBase + (i + 1) * segmentLength, y, -35, "#E91E63"); 
+                  }
+              }
+          }
+        }
+
+        function drawShapeFor(q, isExplanation){
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+          const W = canvas.getBoundingClientRect().width;
+          const startX = 20, startY = 20;
+          const totalBoxes = q.whole+1;
+          const maxRectW = 90, gap = 15;
+          const avail = W - 2*startX;
+          let rectW = Math.min(maxRectW, (avail-(totalBoxes-1)*gap)/totalBoxes);
+          const rectH = 45;
+          let x = startX;
+          const wholeColors = "#00bcd4,#ff5722,#4caf50,#e91e63".split(",");
+
+          ctx.fillStyle="#fff9c4"; ctx.strokeStyle="#f39c12"; ctx.lineWidth=2;
+          ctx.fillRect(x,startY,rectW,rectH); ctx.strokeRect(x,startY,rectW,rectH);
+          for(let i=0; i<q.den; i++){
+            const partX = x + i*(rectW/q.den);
+            ctx.beginPath(); ctx.moveTo(partX,startY); ctx.lineTo(partX,startY+rectH);
+            ctx.strokeStyle="#f39c12"; ctx.lineWidth=1; ctx.stroke();
+            if(i<q.num){
+              ctx.fillStyle="#ffd54f";
+              ctx.fillRect(partX+2, startY+3, rectW/q.den-4, rectH-6);
+            }
+          }
+          x += rectW+gap;
+
+          for(let i=0; i<q.whole; i++){
+            ctx.fillStyle="#a5d6a7"; ctx.strokeStyle="#0b8a3a"; ctx.lineWidth=2;
+            ctx.fillRect(x,startY,rectW,rectH); ctx.strokeRect(x,startY,rectW,rectH);
+            x += rectW+gap;
+          }
+
+          const totalW = totalBoxes*rectW + (totalBoxes-1)*gap;
+          ctx.strokeStyle="#616161"; ctx.lineWidth=1.8;
+          ctx.strokeRect(startX-6, startY-6, totalW+12, rectH+12);
+          
+          if (isExplanation) {
+              ctx.textAlign="center"; ctx.font = "12px Vazirmatn";
+              for(let i=0; i<q.num; i++){ 
+                  const partX = startX + i * (rectW / q.den);
+                  ctx.fillStyle = "#9c27b0"; 
+                  ctx.fillText(toPersian(i + 1), partX + (rectW / q.den) / 2, startY + rectH / 2 + 4); 
+              }
+              for(let i=0; i<q.whole; i++){
+                  const wholeX = startX + rectW + gap + i * (rectW + gap);
+                  ctx.font = "18px Vazirmatn";
+                  ctx.fillStyle = Reflect.get(wholeColors, i % 4);
+                  ctx.fillText(toPersian(i + 1), wholeX + rectW / 2, startY + rectH / 2 + 6);
+              }
+          }
+        }
+
+        function showQuestionUI(q) {
+          const bWhole = document.getElementById('whole');
+          const bNum = document.getElementById('num');
+          const bDen = document.getElementById('den');
+          const eWhole = document.getElementById('eqWhole');
+          const eNum = document.getElementById('eqNum');
+          const eDen = document.getElementById('eqDen');
+          const dWhole = document.getElementById('decWhole');
+          const dPart = document.getElementById('decPart');
+
+          const allInputIds = "whole,num,den,eqWhole,eqNum,eqDen,decWhole,decPart".split(",");
+          for (let i = 0; i < allInputIds.length; i++) {
+              const elId = Reflect.get(allInputIds, i);
+              const el = document.getElementById(elId);
+              el.value = '';
+              el.disabled = false;
+              el.classList.remove('auto-filled', 'correct-input', 'wrong-input', 'empty-input');
+              
+              if (elId === 'whole' || elId === 'eqWhole' || elId === 'decWhole') el.placeholder = 'عدد صحیح';
+              else if (elId === 'num' || elId === 'eqNum') el.placeholder = 'صورت';
+              else if (elId === 'den' || elId === 'eqDen') el.placeholder = 'مخرج';
+              else if (elId === 'decPart') el.placeholder = 'دهم'; 
+          }
+
+          bWhole.style.display = (q.kind === "mixed") ? 'inline-block' : 'none';
+          eWhole.style.display = (q.kind === "mixed") ? 'inline-block' : 'none';
+
+          const canvasWrap = document.getElementById('canvasWrap');
+
+          if(qIndex <= 3) {
+              document.getElementById('eqBlock').style.display = 'none';
+              document.getElementById('eqSign2').style.display = 'none';
+              canvasWrap.style.display = 'block';
+              setTimeout(function(){ DPRResize(); drawCurrentQuestion(false); }, 50); 
+          } 
+          else if (qIndex >= 4 && qIndex <= 7) {
+              document.getElementById('eqBlock').style.display = 'none';
+              document.getElementById('eqSign2').style.display = 'none';
+              canvasWrap.style.display = 'none';
+              
+              bWhole.value = q.whole ? toPersian(q.whole) : '';
+              bNum.value = toPersian(q.num);
+              bDen.value = toPersian(q.den);
+              
+              bWhole.disabled = true; bWhole.classList.add('auto-filled');
+              bNum.disabled = true; bNum.classList.add('auto-filled');
+              bDen.disabled = true; bDen.classList.add('auto-filled');
+          } 
+          else if (qIndex >= 8 && qIndex <= 11) {
+              document.getElementById('eqBlock').style.display = 'flex';
+              document.getElementById('eqSign2').style.display = 'block';
+              canvasWrap.style.display = 'none';
+              
+              bWhole.value = q.whole ? toPersian(q.whole) : '';
+              bNum.value = toPersian(q.num);
+              bDen.value = toPersian(q.den);
+              
+              bWhole.disabled = true; bWhole.classList.add('auto-filled');
+              bNum.disabled = true; bNum.classList.add('auto-filled');
+              bDen.disabled = true; bDen.classList.add('auto-filled');
+          }
+
+          document.getElementById('nextBtn').style.display='none';
+          document.getElementById('btnNewQuestion').style.display='none';
+          document.getElementById('btnShowAnswer').style.display='none';
+          document.getElementById('btnCheck').style.display='inline-block';
+          
+          document.getElementById('feedback').textContent="";
+          app.updateStats(); 
+          updateProgressBar();
+          saveCurrentState(); 
+        }
+
+        function drawCurrentQuestion(isExplanation){
+          if(isExplanation === undefined) isExplanation = false;
+          if(!currentQ || currentQ.form === "none") return;
+          if(currentQ.form==="axis") drawAxisFor(currentQ, isExplanation);
+          else drawShapeFor(currentQ, isExplanation);
+        }
+
+        function saveCurrentState() {
+            localStorage.setItem(GAME_STATE_STORAGE, JSON.stringify({
+                qIndex: qIndex,
+                tempScore: tempScore,
+                questions: questions,
+                answerKeyUsedCount: answerKeyUsedCount
+            }));
+        }
+
+        function checkSavedUnfinishedState() {
+            try {
+                const saved = localStorage.getItem(GAME_STATE_STORAGE);
+                if (saved) {
+                    const d = JSON.parse(saved);
+                    if (d && d.questions) return d;
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function checkAnswer(){
+          if(document.getElementById('decPart').disabled){
+              showFeedback("پاسخ قبلاً با کلید جواب پر شده است. لطفاً سوال جدید را بزنید.", true);
+              return;
+          }
+          const q = currentQ;
+          let isOk = true;
+
+          let targetDecWhole = q.whole;
+          let targetDecPart = q.num * (10 / q.den);
+
+          function checkBox(id, expected, hidden) {
+              if (hidden) return true;
+              let el = document.getElementById(id);
+              let valStr = toEnglish(el.value.trim());
+              
+              el.classList.remove('wrong-input', 'correct-input', 'empty-input');
+
+              if (valStr === "") {
+                  el.classList.add('empty-input');
+                  return false;
+              }
+
+              let val = parseInt(valStr, 10);
+              if (val === expected) {
+                  el.classList.add('correct-input');
+                  return true;
+              } else {
+                  el.classList.add('wrong-input');
+                  return false;
+              }
+          }
+
+          if(qIndex <= 3) {
+              let wOk = checkBox('whole', q.whole, q.kind !== "mixed");
+              let nOk = checkBox('num', q.num, false);
+              let dOk = checkBox('den', q.den, false);
+              if(!(wOk && nOk && dOk)) isOk = false;
+          }
+          
+          if(qIndex >= 8 && qIndex <= 11) {
+              let ewOk = checkBox('eqWhole', targetDecWhole, q.kind !== "mixed");
+              let enOk = checkBox('eqNum', targetDecPart, false);
+              let edOk = checkBox('eqDen', 10, false);
+              if(!(ewOk && enOk && edOk)) isOk = false;
+          }
+
+          let dwOk = checkBox('decWhole', targetDecWhole, false);
+          let dpOk = checkBox('decPart', targetDecPart, false);
+          
+          if(!(dwOk && dpOk)) isOk = false;
+          
+          if(isOk){
+            if(!currentQ.scored) { tempScore++; currentQ.scored = true; }
+            currentQ.attempts++;
+            showFeedback("آفرین! پاسخ کاملاً صحیح است.",true); flowerEffect();
+            document.getElementById('btnCheck').style.display='none';
+            document.getElementById('btnShowAnswer').style.display='none';
+            document.getElementById('nextBtn').style.display='inline-block';
+            document.getElementById('btnNewQuestion').style.display='none';
+          }else{
+            currentQ.attempts++;
+            showFeedback("اشتباه یا ناقص! کادرهای قرمز را بررسی کن و کادرهای آبی را پر کن.",false);
+            document.getElementById('btnShowAnswer').style.display='inline-block';
+            document.getElementById('nextBtn').style.display='none';
+            document.getElementById('btnNewQuestion').style.display='none';
+          }
+          saveCurrentState(); 
+        }
+
+        function showFeedback(txt,correct){
+          const fb = document.getElementById('feedback');
+          fb.innerHTML = txt; 
+          fb.className = correct ? 'correct' : 'wrong';
+        }
+
+        function showAnswer() {
+            answerKeyUsedCount++; 
+            app.save();
+            const q = currentQ;
+            
+            let targetDecWhole = q.whole;
+            let targetDecPart = q.num * (10 / q.den);
+
+            if(qIndex <= 3) {
+                if(q.kind==="mixed") document.getElementById('whole').value = toPersian(q.whole);
+                document.getElementById('num').value = toPersian(q.num);
+                document.getElementById('den').value = toPersian(q.den);
+            }
+            if(qIndex >= 8 && qIndex <= 11) {
+                if(q.kind==="mixed") document.getElementById('eqWhole').value = toPersian(targetDecWhole);
+                document.getElementById('eqNum').value = toPersian(targetDecPart);
+                document.getElementById('eqDen').value = toPersian(10);
+            }
+            
+            document.getElementById('decWhole').value = toPersian(targetDecWhole);
+            document.getElementById('decPart').value = toPersian(targetDecPart);
+
+            const allInputIds = "whole,num,den,eqWhole,eqNum,eqDen,decWhole,decPart".split(",");
+            for(let i=0; i<allInputIds.length; i++){
+                const elId = Reflect.get(allInputIds, i);
+                const el = document.getElementById(elId);
+                if(el) {
+                    el.disabled = true;
+                    el.classList.remove('wrong-input', 'empty-input');
+                    el.classList.add('correct-input');
+                }
+            }
+            
+            drawCurrentQuestion(true); 
+            
+            let answerText = "جواب صحیح: " + toPersian(targetDecWhole) + "٫" + toPersian(targetDecPart) + " است.";
+            showFeedback("🔑 **کلید پاسخ**: " + answerText + " <br> با زدن دکمه **\"سوال جدید\"**، سوال عوض شده تا مرحله را تکمیل کنید.", true); 
+            document.getElementById('btnShowAnswer').style.display = 'none';
+            document.getElementById('btnCheck').style.display = 'none'; 
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('btnNewQuestion').style.display = 'inline-block';
+        }
+
+        function generateNewQuestionInSameStage() {
+            const newQ = generateSingleQuestion(qIndex);
+            questions.splice(qIndex, 1, newQ);
+            currentQ = newQ;
+            showQuestionUI(newQ);
+            showFeedback("یک سوال جدید برای این مرحله جایگزین شد. حالا تلاش کنید!", true);
+        }
+
+        function startNewGame() {
+            questions = buildQuestions();
+            qIndex = 0;
+            tempScore = 0;
+            showQuestionUI(Reflect.get(questions, 0));
+            updateProgressBar();
+        }
+
+        async function finishGame(shouldUpdateScore){
+            app.showScreen('portal-submitting-screen');
+            const earnedThisGame = (shouldUpdateScore && answerKeyUsedCount === 0) ? 1 : 0;
+            
+            totalGames = totalGames + 1;
+            if (earnedThisGame === 1) {
+                totalStars = totalStars + 1;
+            }
+            app.state.reportShown = true;
+            
+            localStorage.removeItem(GAME_STATE_STORAGE);
+            app.save();
+            app.updateStats();
+
+            await Portal.submitProgress(earnedThisGame, {
+                onSuccess: (data) => {
+                    totalGames = data.plays;
+                    totalStars = data.stars;
+                    app.state.stats.games = data.plays;
+                    app.state.stats.stars = data.stars;
+                    app.save();
+                    app.updateStats();
+                    app.showScreen('screen-report');
+                },
+                onFailure: (err) => {
+                }
+            });
+        }
+
+        function flowerEffect(){
+          for(let i=0; i<45; i++){
+            setTimeout(function(){
+              const f = document.createElement('div');
+              f.className='flower';
+              f.textContent='🌸';
+              f.style.left = (8+Math.random()*(window.innerWidth-40)) + 'px';
+              f.style.fontSize = (14 + Math.random() * 16) + 'px';
+              document.body.appendChild(f);
+              setTimeout(function(){f.remove();}, 2600);
+            }, i*70);
+          }
+        }
+
+        window.submitAssistantStar = async function() {
+            app.showScreen('portal-submitting-screen');
+            await Portal.submitProgress(null, {
+                onSuccess: (data) => { authenticatePortalStudent(); },
+                onFailure: (err) => {}
+            });
+        };
+
+        window.retryAuthentication = function() {
+            const errSec = document.getElementById('portal-error-section');
+            const regSec = document.getElementById('register-container');
+            if (errSec) errSec.style.display = 'none';
+            if (regSec) regSec.style.display = 'block';
+            authenticatePortalStudent();
+        };
+
+        async function authenticatePortalStudent() {
+            await Portal.authenticate({
+                onSuccess: (data) => {
+                    try {
+                        const regSec = document.getElementById('register-container');
+                        if (regSec) regSec.style.display = '';
+                        document.getElementById('portal-welcome-section').style.display = '';
+                        document.getElementById('startGame').style.display = '';
+                        document.getElementById('portal-error-section').style.display = 'none';
+
+                        STORAGE = `studentProfile_DecimalNumber_${Portal.studentId}_${Portal.homeworkId}`;
+                        GAME_STATE_STORAGE = `gameState_DecimalNumber_${Portal.studentId}_${Portal.homeworkId}`;
+                        
+                        const saved = localStorage.getItem(STORAGE);
+                        let parsedState = null;
+                        if (saved) {
+                            try {
+                                parsedState = JSON.parse(saved);
+                            } catch (e) {}
+                        }
+
+                        if (parsedState && typeof parsedState === 'object') {
+                            app.state = parsedState;
+                        } else {
+                            app.state = {
+                                user: data.name,
+                                stats: { games: data.plays, stars: data.stars },
+                                lastHelpUsed: false,
+                                isTutorialMode: false,
+                                reportShown: false
+                            };
+                        }
+                        
+                        playerName = data.name || Portal.studentName || app.state.user || "دانش‌آموز";
+                        app.state.user = playerName;
+                        if (!app.state.stats) {
+                            app.state.stats = { games: 0, stars: 0 };
+                        }
+                        totalGames = data.plays !== undefined ? data.plays : app.state.stats.games;
+                        totalStars = data.stars !== undefined ? data.stars : app.state.stats.stars;
+                        app.state.stats.games = totalGames;
+                        app.state.stats.stars = totalStars;
+                        
+                        app.save();
+                        app.updateStats();
+
+                        document.getElementById('portal-student-name').textContent = app.state.user;
+                        document.getElementById('portal-prev-plays').textContent = toPersian(app.state.stats.games);
+                        document.getElementById('portal-prev-stars').textContent = toPersian(app.state.stats.stars) + ' ⭐';
+                        document.getElementById('portal-req-stars').textContent = toPersian(Portal.requiredStars) + ' ⭐';
+
+                        const activeState = checkSavedUnfinishedState();
+                        const startBtn = document.getElementById('startGame');
+                        if (activeState) {
+                            startBtn.textContent = 'ادامه بازی (باقیمانده) 🔄';
+                            startBtn.style.backgroundColor = '#ff9800';
+                        } else {
+                            startBtn.textContent = 'شروع بازی تکلیف 🎮';
+                            startBtn.style.backgroundColor = '#2ecc71';
+                        }
+
+                        const needsSubmitKey = `portal_needs_submit_${Portal.gameId}_${Portal.studentId}_${Portal.homeworkId}`;
+                        const hasUnsentStar = localStorage.getItem(needsSubmitKey) === 'true';
+
+                        if (hasUnsentStar) {
+                            document.getElementById('ast-welcome').textContent = `سلام ${app.state.user} عزیز! 🌟`;
+                            document.getElementById('ast-name').textContent = app.state.user;
+                            document.getElementById('ast-stars').textContent = toPersian(app.state.stats.stars) + ' ⭐';
+                            document.getElementById('ast-req-stars').textContent = toPersian(Portal.requiredStars) + ' ⭐';
+                            app.showScreen('screen-assistant');
+                        } else if (app.state.reportShown) {
+                            app.showScreen('screen-report');
+                        } else if (activeState) {
+                            try {
+                                app.showScreen('screen-game');
+                                app.restore();
+                            } catch (ex) {
+                                localStorage.removeItem(GAME_STATE_STORAGE);
+                                app.state.reportShown = false;
+                                app.save();
+                                app.showScreen('screen-register');
+                            }
+                        } else {
+                            app.showScreen('screen-register');
+                        }
+                    } catch (errGlobal) {
+                        app.showScreen('screen-register');
+                        document.getElementById('portal-welcome-section').style.display = 'none';
+                        document.getElementById('startGame').style.display = 'none';
+                        document.getElementById('portal-error-section').style.display = 'block';
+                    }
+                },
+                onFailure: (err) => {
+                    app.showScreen('screen-register');
+                    document.getElementById('portal-welcome-section').style.display = 'none';
+                    document.getElementById('startGame').style.display = 'none';
+                    document.getElementById('portal-error-section').style.display = 'block';
+                    const regScreen = document.getElementById('screen-register');
+                    if (regScreen) regScreen.classList.remove('hidden');
+                },
+                onGuestMode: () => {
+                    app.showScreen('screen-register');
+                    document.getElementById('portal-welcome-section').style.display = 'none';
+                    document.getElementById('startGame').style.display = 'none';
+                    document.getElementById('portal-error-title').textContent = 'لینک ورود نامعتبر است';
+                    document.getElementById('portal-error-desc').textContent = 'جهت انجام این تکلیف، حتماً باید از طریق پنل مدرسه و با لینک اختصاصی خودت وارد بشی.';
+                    document.getElementById('portal-retry-auth-btn').style.display = 'none';
+                    document.getElementById('portal-error-section').style.display = 'block';
+                    const regScreen = document.getElementById('screen-register');
+                    if (regScreen) regScreen.classList.remove('hidden');
+                }
+            });
+        }
+
+        function initApp() {
+            app.init();
+            window.addEventListener('beforeunload', () => {
+                if (app.state && app.state.user) app.save();
+            });
+            const startBtn = document.getElementById('startGame');
+            if (startBtn) {
+                startBtn.onclick = () => {
+                    try {
+                        answerKeyUsedCount = 0;
+                        app.state.reportShown = false;
+                        const activeState = checkSavedUnfinishedState();
+                        if (activeState) {
+                            app.restore();
+                        } else {
+                            startNewGame();
+                        }
+                        app.showScreen('screen-game');
+                        app.updateStats();
+                        app.save();
+                    } catch (e) {
+                        localStorage.removeItem(GAME_STATE_STORAGE);
+                        app.state.reportShown = false;
+                        app.save();
+                        startNewGame();
+                        app.showScreen('screen-game');
+                        app.updateStats();
+                        app.save();
+                    }
+                };
+            }
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', function(){
+          qIndex++; 
+          if(qIndex >= CONFIG.QUESTIONS_PER_GAME){ finishGame(true); return; }
+          currentQ = Reflect.get(questions, qIndex);
+          showQuestionUI(currentQ);
+        });
+
+        document.getElementById('btnCheck').addEventListener('click', checkAnswer);
+        document.getElementById('btnShowAnswer').addEventListener('click', showAnswer);
+        document.getElementById('btnNewQuestion').addEventListener('click', generateNewQuestionInSameStage); 
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                initCanvas(); 
+                setupPersianInputListeners();
+                initApp();
+            });
+        } else {
+            initCanvas(); 
+            setupPersianInputListeners();
+            initApp();
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    window.location.reload();
+                    refreshing = true;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
