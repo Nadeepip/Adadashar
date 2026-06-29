@@ -230,6 +230,7 @@
             transition: left 0.3s ease;
         }
         .canvasWrap {
+            width: 100%;
             border: 3px dashed #ff4382;
             border-radius: 12px;
             padding: 10px;
@@ -247,6 +248,7 @@
             background: #fff;
         }
         .inputs {
+            width: 100%;
             display: flex;
             direction: ltr;
             gap: 2px;
@@ -258,6 +260,9 @@
             padding: 10px 2px;
             border-radius: 12px;
             border: 2px dashed #ff9800;
+        }
+        #register-container {
+            width: 100%;
         }
         .flex-row {
             display: flex;
@@ -605,6 +610,7 @@
                     qIndex = d.qIndex;
                     tempScore = d.tempScore;
                     questions = d.questions;
+                    answerKeyUsedCount = d.answerKeyUsedCount || 0;
                     currentQ = Reflect.get(questions, qIndex);
                     showQuestionUI(currentQ);
                 }
