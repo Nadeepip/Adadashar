@@ -335,7 +335,7 @@
             color: #555;
         }
         @keyframes blink-fill {
-            0% { background-color: #ffe082; transform: scale(1.1); box-shadow: 0 0 10px #f39c12; }
+            0% { background-color: #ffe082; transform: scale(1.1;); box-shadow: 0 0 10px #f39c12; }
             50% { background-color: #f1c40f; transform: scale(1.15); border-color: #d35400; }
             100% { background-color: #d4edda; transform: scale(1); box-shadow: none; }
         }
@@ -698,11 +698,18 @@
 
         function DPRResize(){
           if(!canvas) return;
-          const rect = canvas.getBoundingClientRect();
-          if(rect.width===0) return;
+          let rect = canvas.getBoundingClientRect();
+          let w = rect.width;
+          if (w <= 0) {
+              const card = document.querySelector('.card');
+              if (card) {
+                  w = card.getBoundingClientRect().width - 32;
+              }
+          }
+          if (w <= 0) w = 400;
           const dpr = window.devicePixelRatio||1;
-          canvas.width = Math.round(rect.width*dpr);
-          canvas.height = Math.round(rect.height*dpr);
+          canvas.width = Math.round(w*dpr);
+          canvas.height = Math.round(160*dpr);
           ctx.setTransform(dpr,0,0,dpr,0,0);
         }
         window.addEventListener('resize', function(){if(canvas){DPRResize();drawCurrentQuestion(false);}});
@@ -775,8 +782,15 @@
         }
 
         function drawAxisFor(q, isExplanation){
-          const rect = canvas.getBoundingClientRect();
-          const W = rect.width;
+          let rect = canvas.getBoundingClientRect();
+          let W = rect.width;
+          if (W <= 0) {
+              const card = document.querySelector('.card');
+              if (card) {
+                  W = card.getBoundingClientRect().width - 32;
+              }
+          }
+          if (W <= 0) W = 400;
           const padding = 20, y = 80;
           ctx.clearRect(0,0,canvas.width,canvas.height);
 
@@ -827,7 +841,15 @@
 
         function drawShapeFor(q, isExplanation){
           ctx.clearRect(0,0,canvas.width,canvas.height);
-          const W = canvas.getBoundingClientRect().width;
+          let rect = canvas.getBoundingClientRect();
+          let W = rect.width;
+          if (W <= 0) {
+              const card = document.querySelector('.card');
+              if (card) {
+                  W = card.getBoundingClientRect().width - 32;
+              }
+          }
+          if (W <= 0) W = 400;
           const startX = 20, startY = 20;
           const totalBoxes = q.whole+1;
           const maxRectW = 90, gap = 15;
