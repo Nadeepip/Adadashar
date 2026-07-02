@@ -95,7 +95,6 @@
 </head>
 <body>
 
-  <!-- صفحه‌ی بارگذاری موقت -->
   <div id="Screen-Loading" style="display:none; background:#f7f9fc; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
       <div style="font-size: 3.5rem; margin-bottom: 15px;">🐰</div>
       <h1 style="color:#d81b60; font-size:24pt; margin-bottom:30px; font-weight: bold;">عدد اعشاری</h1>
@@ -105,7 +104,6 @@
       <p id="portal-loading-text" style="font-size:13pt; color:#d81b60; font-weight:bold;"></p>
   </div>
 
-  <!-- صفحه خوش‌آمدگویی پرتال -->
   <div class="card screen" id="screen-register">
     <div id="welcome" style="background:#ffffff; border-radius:12px; padding:12px; width:100%; text-align:right; direction:rtl;">
       <div style="text-align:center;margin-bottom:12px;font-size:16pt;font-weight:bold;color:#d81b60;" id="portal-school-title">دبستان معاد خرگوشی</div>
@@ -143,7 +141,6 @@
     </div>
   </div>
 
-  <!-- صفحه دستیار ستاره معلق -->
   <div id="screen-assistant" class="screen">
     <div class="card" style="text-align: center;">
       <h2 style="color: #d81b60; margin-bottom: 20px; font-size: 1.5rem;">🌟 دستیار ثبت ستاره 🌟</h2>
@@ -163,7 +160,6 @@
     </div>
   </div>
 
-  <!-- صفحه اصلی جریان بازی -->
   <div class="card screen" id="screen-game">
     <h1>دبستان معاد خرگوشی — عدد اعشاری</h1>
     <div id="profile" class="profile">
@@ -225,7 +221,6 @@
     </div>
   </div>
 
-  <!-- صفحه ارسال نتایج موقت به سرور پرتال -->
   <div id="portal-submitting-screen" class="screen">
     <div class="card" style="text-align: center;">
       <h3 id="portal-progress-title" style="color:#d81b60; margin-bottom:15px; font-weight:bold; font-size:16pt;">⏳ در حال ارسال نتایج به دیتابیس کلاس...</h3>
@@ -237,7 +232,6 @@
     </div>
   </div>
 
-  <!-- صفحه گزارش نهایی -->
   <div id="screen-report" class="screen">
     <div class="card" style="text-align: center;">
       <h3 style="color:#d81b60; font-size:18pt; margin-bottom:15px;">تبریک! تمرین تمام شد 🎉</h3>
@@ -1055,8 +1049,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let refreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
             if (!refreshing) {
-                window.location.reload();
-                refreshing = true;
+                if (navigator.serviceWorker.controller) {
+                    window.location.reload();
+                    refreshing = true;
+                }
             }
         });
     }
